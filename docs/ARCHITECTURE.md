@@ -93,3 +93,15 @@ API Ravelry pour le catalogue de fils et la recherche de patrons. Les identifian
 - Cibles tactiles ≥ 48 px, utilisable d'une main ; prise en compte du mode sombre (`prefers-color-scheme`).
 - Chaque module livre des tests Vitest sur sa logique (calculs, helpers db) ; `npm run lint`, `npm run typecheck`, `npm test` et `npm run build` doivent passer.
 - Commits en français ou anglais, petits et explicites. Une branche par module, PR vers `main`.
+
+## Contrats entre modules (phase 1)
+
+Pour développer les modules en parallèle, chaque module expose ses éléments publics dans `src/modules/<module>/index.ts`. Les autres modules n'importent que depuis cet index. Les stubs existent déjà dans le socle ; le module propriétaire les implémente sans changer leur signature.
+
+| Élément | Propriétaire | Utilisé par |
+|---|---|---|
+| `ProjectTricotPanel({ projectId })` : chrono, compte-rangs, journal | tricot | fiche projet |
+| `readerPath(fileId)` → route `/tricot/liseuse/:fileId` | tricot | fiche patron, fiche projet |
+| `ProjectYarnPanel({ projectId })` : fils et consommations du projet | filotheque | fiche projet |
+| `DriveImportButton({ onImported })` : import Google Picker → table `files` | sync | import de patrons |
+| `saveFile(blob, options)` dans `src/db/files.ts` | socle | patrons, sync |

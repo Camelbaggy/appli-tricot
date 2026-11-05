@@ -11,3 +11,4 @@ export {
   getActiveById,
 } from './helpers';
 export { useActive, useActiveById } from './hooks';
+export { saveFile } from './files';
