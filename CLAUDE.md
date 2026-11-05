@@ -1,6 +1,6 @@
 # Appli Tricot
 
-PWA hors-ligne de gestion de tricot (projets, patrons, laine, liseuse de grilles, jacquard). Lire `docs/ARCHITECTURE.md` avant toute modification ; le cahier des charges est `docs/PROJET.md`.
+PWA hors-ligne de gestion de tricot (projets, patrons, laine, liseuse de grilles, jacquard). Pour reprendre le projet, lire d'abord `docs/SUIVI.md` (état, décisions, méthode, prochaines étapes). Lire `docs/ARCHITECTURE.md` avant toute modification ; le cahier des charges est `docs/PROJET.md`.
 
 ## Commandes
 
