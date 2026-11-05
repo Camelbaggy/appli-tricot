@@ -42,5 +42,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Les worktrees des agents (.claude/worktrees) ne doivent pas être testés depuis la racine.
+    exclude: ['**/node_modules/**', '**/dist/**', '.claude/**'],
   },
 });
