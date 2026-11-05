@@ -1,18 +1,18 @@
+import { lazy, Suspense } from 'react';
 import type { RouteObject } from 'react-router-dom';
-import { Wrench } from 'lucide-react';
-import { EmptyState, PageHeader } from '../../components';
+import { TricotDashboard } from './TricotDashboard';
 
-function TricotPage() {
-  return (
-    <>
-      <PageHeader title="Outils" />
-      <EmptyState
-        icon={<Wrench size={40} />}
-        title="Boîte à outils"
-        description="Chronomètre, compte-rangs, journal de bord et liseuse de grilles arriveront ici."
-      />
-    </>
-  );
-}
+// La liseuse (et pdf.js) est chargée à la demande pour ne pas alourdir le démarrage.
+const ReaderPage = lazy(() => import('./ReaderPage'));
 
-export const routes: RouteObject[] = [{ path: '/tricot', element: <TricotPage /> }];
+export const routes: RouteObject[] = [
+  { path: '/tricot', element: <TricotDashboard /> },
+  {
+    path: '/tricot/liseuse/:fileId',
+    element: (
+      <Suspense fallback={<p className="p-4">Chargement…</p>}>
+        <ReaderPage />
+      </Suspense>
+    ),
+  },
+];
