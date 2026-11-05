@@ -6,6 +6,8 @@
  * (fit = largeur de l'écran / DOC_WIDTH) et le coin haut-gauche du document est en (panX, panY).
  */
 export const DOC_WIDTH = 1000;
+/** Hauteur (px écran) réservée en haut pour la barre d'outils : la page commence dessous. */
+export const TOP_INSET = 64;
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 6;
 
@@ -49,13 +51,19 @@ export function zoomAround(view: View, focalX: number, focalY: number, newZoom: 
 }
 
 /** Garde le document visible : centré s'il est plus petit que l'écran, sinon sans vide. */
-export function clampView(view: View, viewport: Size, docHeight: number): View {
+export function clampView(
+  view: View,
+  viewport: Size,
+  docHeight: number,
+  topInset: number = TOP_INSET,
+): View {
   const s = screenScale(viewport.width, view.zoom);
   const w = DOC_WIDTH * s;
   const h = docHeight * s;
   const panX =
     w <= viewport.width ? (viewport.width - w) / 2 : clamp(view.panX, viewport.width - w, 0);
-  const panY = h <= viewport.height ? 0 : clamp(view.panY, viewport.height - h, 0);
+  const panY =
+    h <= viewport.height - topInset ? topInset : clamp(view.panY, viewport.height - h, topInset);
   return { ...view, panX, panY };
 }
 
@@ -69,7 +77,29 @@ export function nextRulerY(
   return clamp(rulerY + direction * rowHeight, 0, Math.max(0, docHeight - rowHeight));
 }
 
-/** Pan vertical qui amène l'ordonnée document `docY` au tiers haut de l'écran. */
-export function panToReveal(docY: number, view: View, viewport: Size): number {
-  return viewport.height / 3 - docY * screenScale(viewport.width, view.zoom);
+/** Pan vertical qui amène l'ordonnée document `docY` au premier tiers de la zone visible. */
+export function panToReveal(
+  docY: number,
+  view: View,
+  viewport: Size,
+  topInset: number = TOP_INSET,
+): number {
+  const third = topInset + (viewport.height - topInset) / 3;
+  return third - docY * screenScale(viewport.width, view.zoom);
+}
+
+/** Position par défaut de la barre : premier tiers de la zone visible, sous la barre d'outils. */
+export function defaultRulerY(
+  view: View,
+  viewport: Size,
+  docHeight: number,
+  rulerHeight: number,
+  topInset: number = TOP_INSET,
+): number {
+  const screenY = topInset + (viewport.height - topInset) / 3;
+  return clamp(
+    screenToDocY(screenY, view, viewport.width),
+    0,
+    Math.max(0, docHeight - rulerHeight),
+  );
 }

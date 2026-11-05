@@ -33,7 +33,9 @@ import { useWakeLock } from './useWakeLock';
 import {
   DOC_WIDTH,
   clamp,
+  TOP_INSET,
   clampView,
+  defaultRulerY,
   docToScreenY,
   nextRulerY,
   panToReveal,
@@ -205,10 +207,15 @@ function Reader({
     const s = saved.current ?? DEFAULT_READER;
     const zoom = clamp(s.zoom, 1, 6);
     const v: View = { zoom, panX: 0, panY: 0 };
-    if (s.rulerY > 0) v.panY = panToReveal(s.rulerY, v, size);
+    v.panY = TOP_INSET;
+    let rulerY = s.rulerY;
+    if (rowId.current === undefined) {
+      // première ouverture : barre dans la zone visible, vers le premier tiers
+      rulerY = defaultRulerY(v, size, docHeightRef.current, prefs.rulerHeight);
+    } else if (rulerY > 0) v.panY = panToReveal(rulerY, v, size);
     applyView(v);
-    setState((st) => ({ ...st, page: clamp(s.page, 1, pageCount) }));
-  }, [ready, docKnown, size, pageCount, applyView]);
+    setState((st) => ({ ...st, rulerY, page: clamp(s.page, 1, pageCount) }));
+  }, [ready, docKnown, size, pageCount, applyView, docHeightRef, prefs.rulerHeight]);
 
   // reclamp quand le document ou l'écran change
   useEffect(() => {
@@ -244,8 +251,13 @@ function Reader({
   // --- page
   const goPage = (p: number) => {
     const page = clamp(p, 1, pageCount);
-    setState((s) => ({ ...s, page, rulerY: 0 }));
-    applyView({ ...viewRef.current, panY: 0 });
+    const v = { ...viewRef.current, panY: TOP_INSET };
+    setState((s) => ({
+      ...s,
+      page,
+      rulerY: defaultRulerY(v, size, docHeight, prefs.rulerHeight),
+    }));
+    applyView(v);
   };
 
   // --- zoom
@@ -345,7 +357,7 @@ function Reader({
     const v = viewRef.current;
     const top = docToScreenY(rulerY, v, size.width);
     const bottom = docToScreenY(rulerY + prefs.rulerHeight, v, size.width);
-    if (top < 64 || bottom > size.height - 190)
+    if (top < TOP_INSET || bottom > size.height - 190)
       applyView({ ...v, panY: panToReveal(rulerY, v, size) });
   };
 
@@ -427,8 +439,15 @@ function Reader({
             data-ruler-y={rulerY.toFixed(1)}
             role="separator"
             aria-label="Barre de repérage"
-            className="absolute left-0 right-0 cursor-grab border-y-2 border-brand-500 bg-brand-500/30"
-            style={{ top: rulerY, height: prefs.rulerHeight }}
+            className="absolute left-0 right-0 cursor-grab border-solid border-brand-700 bg-brand-500/40"
+            style={{
+              top: rulerY,
+              height: prefs.rulerHeight,
+              boxSizing: 'border-box',
+              borderTopWidth: 3 / s,
+              borderBottomWidth: 3 / s,
+              boxShadow: `0 0 ${6 / s}px rgba(255,255,255,0.9)`,
+            }}
           />
         </div>
         {error && (

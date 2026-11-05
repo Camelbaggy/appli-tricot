@@ -13,6 +13,8 @@ import {
 } from './time';
 import {
   DOC_WIDTH,
+  TOP_INSET,
+  defaultRulerY,
   clampView,
   docToScreenY,
   nextRulerY,
@@ -127,10 +129,21 @@ describe('coordonnées barre / document', () => {
     expect(zoomAround(view, 0, 0, 0.1).zoom).toBe(1);
     const c = clampView({ panX: 50, panY: 50, zoom: 1 }, { width: 400, height: 800 }, 4000);
     expect(c.panX).toBeCloseTo(0);
-    expect(c.panY).toBe(0);
+    expect(c.panY).toBe(50);
+    const top = clampView({ panX: 0, panY: 500, zoom: 1 }, { width: 400, height: 800 }, 4000);
+    expect(top.panY).toBe(TOP_INSET);
+    const small = clampView({ panX: 0, panY: -90, zoom: 1 }, { width: 400, height: 800 }, 1000);
+    expect(small.panY).toBe(TOP_INSET);
     const d = clampView({ panX: 0, panY: -99999, zoom: 1 }, { width: 400, height: 800 }, 4000);
     expect(d.panY).toBeCloseTo(800 - 4000 * 0.4);
     expect(DOC_WIDTH).toBe(1000);
+  });
+  it('place la barre par défaut dans la zone visible, sous la barre d’outils', () => {
+    const v = { panX: 0, panY: TOP_INSET, zoom: 1 };
+    const y = defaultRulerY(v, { width: 400, height: 800 }, 1414, 80);
+    const screen = docToScreenY(y, v, 400);
+    expect(screen).toBeGreaterThan(TOP_INSET);
+    expect(screen).toBeLessThan(400);
   });
   it('déplace la barre d’une hauteur de rang, bornée', () => {
     expect(nextRulerY(100, 40, -1, 1000)).toBe(60);
