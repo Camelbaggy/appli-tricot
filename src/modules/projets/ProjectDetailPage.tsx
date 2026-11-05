@@ -95,16 +95,18 @@ export function ProjectDetailPage() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <Card className="flex flex-col gap-1">
-          <Info label="Début" value={formatDate(project.startDate)} />
-          <Info label="Fin" value={formatDate(project.endDate)} />
-          <Info label="Pièce pro" value={project.isPro ? 'Oui' : ''} />
-          {project.notes && (
-            <p className="mt-2 whitespace-pre-wrap text-stone-700 dark:text-stone-300">
-              {project.notes}
-            </p>
-          )}
-        </Card>
+        {(project.startDate || project.endDate || project.isPro || project.notes) && (
+          <Card className="flex flex-col gap-1">
+            <Info label="Début" value={formatDate(project.startDate)} />
+            <Info label="Fin" value={formatDate(project.endDate)} />
+            <Info label="Pièce pro" value={project.isPro ? 'Oui' : ''} />
+            {project.notes && (
+              <p className="mt-2 whitespace-pre-wrap text-stone-700 dark:text-stone-300">
+                {project.notes}
+              </p>
+            )}
+          </Card>
+        )}
 
         {pattern && (
           <Card className="flex flex-col gap-2">
