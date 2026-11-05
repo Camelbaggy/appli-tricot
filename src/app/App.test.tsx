@@ -8,7 +8,7 @@ describe('App', () => {
     window.location.hash = '';
     render(<App />);
     expect(await screen.findByRole('heading', { name: 'Projets' })).toBeInTheDocument();
-    expect(screen.getByText('Hors-ligne / local')).toBeInTheDocument();
+    expect(screen.getByText('Local seulement')).toBeInTheDocument();
 
     const nav = screen.getByRole('navigation', { name: 'Navigation principale' });
     expect(nav.querySelectorAll('a')).toHaveLength(4);
