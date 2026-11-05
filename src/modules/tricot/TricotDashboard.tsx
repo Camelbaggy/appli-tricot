@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Minus, Pause, Play, Plus, Wrench } from 'lucide-react';
 import { Button, Card, EmptyState, PageHeader } from '../../components';
-import { db, update, useActive } from '../../db';
+import { db, useActive } from '../../db';
 import type { Counter, Project } from '../../db';
-import { applyDelta, counterSummary } from './counters';
+import { stepCounter } from './counterActions';
+import { counterSummary } from './counters';
 import { startSession, stopSession } from './timer';
 import {
   findOpenSession,
@@ -127,13 +128,13 @@ function ProjectCard({
             <Button
               variant="secondary"
               aria-label={`Moins un, ${c.label} (${project.name})`}
-              onClick={() => void update(db.counters, c.id, { value: applyDelta(c.value, -1) })}
+              onClick={() => void stepCounter(c.id, -1)}
             >
               <Minus aria-hidden />
             </Button>
             <Button
               aria-label={`Plus un, ${c.label} (${project.name})`}
-              onClick={() => void update(db.counters, c.id, { value: applyDelta(c.value, 1) })}
+              onClick={() => void stepCounter(c.id, 1)}
             >
               <Plus aria-hidden />
             </Button>

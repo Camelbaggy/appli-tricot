@@ -4,7 +4,8 @@ import { Button, Card, Input, Sheet } from '../../components';
 import { create, db, softDelete, update, useActive } from '../../db';
 import type { Counter } from '../../db';
 import { ConfirmSheet } from './ConfirmSheet';
-import { applyDelta, counterSummary, moveId, parseTarget } from './counters';
+import { stepCounter } from './counterActions';
+import { counterSummary, moveId, parseTarget } from './counters';
 
 /** Compteurs actifs d'un projet, triés par `order`. */
 export function useProjectCounters(projectId: string): Counter[] {
@@ -111,14 +112,14 @@ export function CountersSection({ projectId }: { projectId: string }) {
                 variant="secondary"
                 className="min-h-[5rem] flex-1"
                 aria-label={`Moins un, ${c.label}`}
-                onClick={() => void update(db.counters, c.id, { value: applyDelta(c.value, -1) })}
+                onClick={() => void stepCounter(c.id, -1)}
               >
                 <Minus aria-hidden size={36} />
               </Button>
               <Button
                 className="min-h-[5rem] flex-[2]"
                 aria-label={`Plus un, ${c.label}`}
-                onClick={() => void update(db.counters, c.id, { value: applyDelta(c.value, 1) })}
+                onClick={() => void stepCounter(c.id, 1)}
               >
                 <Plus aria-hidden size={40} />
               </Button>
